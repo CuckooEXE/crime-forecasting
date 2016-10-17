@@ -9,6 +9,7 @@ This Github is an entry for the [NIJ Real-Time Crime Forecasting Challenge](http
 
 This is a small team entry with the following team-members:
 * David Freiberg - PhD Student (Materials Science), Drexel University
+* Mairen Hilary - Undergraduate Student (Criminology and Justice Studies), Drexel University
 * Axel Munoz - Undergraduate Student (Cryptology and Intelligence Analysis), Drexel University
 * Christine Palmer - Data Analyst, If-I-Told-You-I'd-Have-To-Kill-You
 
