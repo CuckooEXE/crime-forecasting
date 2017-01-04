@@ -1,44 +1,50 @@
-# Import known Python modules. Used to install modules, check if they're installed, and work with finding files
-import imp
-import os
-import glob
-
-# If the necessary modules aren't installed, install them!
-try:
-    imp.find_module('csv')
-except ImportError:
-	os.system("pip install csv")
-
-try:
-    imp.find_module('pyproj')
-except ImportError:
-	os.system("pip install pyproj")
-
-# Now that we know the modules are in, import them
-import csv
+########################################################################################################################
+#                                                  IMPORT LIBRARIES
+#
+#   pyproj - coordinate library for python
+#   glob - detect files inside a directory for parsing
+#   csv - edit CSV files
+########################################################################################################################
 from pyproj import Proj, transform
+import glob
+import csv
 
-csvFiles = glob.glob("csv/*.csv")
+########################################################################################################################
+#                                                  GLOBAL VARIABLES
+#
+#   inProj - the crazy coordinate system they use
+#   outProj - lat/lon coordinate system
+########################################################################################################################
+inProj = Proj(init='epsg:3857')
+outProj = Proj(init='epsg:4326')
 
-for filename in csvFiles:
-	csvFile = open(filename, 'rt')
-	reader = csv.reader(csvFile)
-	newCsv = []
-	for row in reader:
-		if "x_coordinate" not in row:
-			tempRow = row
-			inProj = Proj(init='epsg:3857')
-			outProj = Proj(init='epsg:4326')
-			x1,y1 = float(row[5]),float(row[6])
-			tempRow[5],tempRow[6] = transform(inProj,outProj,x1,y1)
 
-			newCsv.append(tempRow)
+########################################################################################################################
+#                                                  FUNCTION: MAIN
+#   Drives the program (old habits die hard)
+########################################################################################################################
+def main():
+    #Create the final document
+    f = open('lat-lon', 'w')
 
-	csvFile.close()
+    # Get the files in the CSV folder
+    csvFiles = glob.glob("csv/*.csv")
 
-	csvFile = open(filename, 'wb')
-	writer = csv.writer(csvFile)
-	writer.writerows(newCsv)
+    # Loop through them and make a super CSV
+    for filename in csvFiles:
+        csvFile = open(filename, 'rt')
+        reader = csv.reader(csvFile)
+        for row in reader:
+            if "x_coordinate" not in row:
+                x,y=transform(inProj,outProj,float(row[5]),float(row[6]))
+                f.write(row[0].strip(' ') + '\t')
+                f.write(row[1].strip(' ') + '\t')
+                f.write(row[2].strip(' ') + '\t')
+                f.write(row[3].strip(' ') + '\t')
+                f.write(row[4].strip(' ') + '\t')
+                f.write(str(x)+ '\t')
+                f.write(str(y) + '\t')
+                f.write(row[7].strip(' '))
 
-	csvFile.close()
-#a
+    f.close()
+main()
