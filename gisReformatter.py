@@ -45,6 +45,7 @@ def main():
                 f.write(str(x)+ '\t')
                 f.write(str(y) + '\t')
                 f.write(row[7].strip(' '))
+                f.write('\n')
 
     f.close()
 main()
