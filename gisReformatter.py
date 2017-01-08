@@ -36,7 +36,10 @@ def main():
         reader = csv.reader(csvFile)
         for row in reader:
             if "x_coordinate" not in row:
+                inProj = Proj(init='esri:102726', preserve_units=True)
+                outProj = Proj(init='epsg:4236')
                 x,y=transform(inProj,outProj,float(row[5]),float(row[6]))
+                print x, y
                 f.write(row[0].strip(' ') + '\t')
                 f.write(row[1].strip(' ') + '\t')
                 f.write(row[2].strip(' ') + '\t')

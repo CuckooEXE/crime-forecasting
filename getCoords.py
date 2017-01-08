@@ -18,10 +18,8 @@ def getCoords():
 
         # Loop through and create a list
         for line in file:
-            print line
             line = [splits for splits in line.split("\t") if splits is not ""]
-            coords.append([line[5],line[6]])
-
+            coords.append([float(line[5]),float(line[6])])
     return coords
 
 getCoords()
