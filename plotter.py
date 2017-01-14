@@ -11,7 +11,7 @@
 ########################################################################################################################
 import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
-from getCoords
+import getCoords
 import time
 import os
 
@@ -24,15 +24,23 @@ import os
 ########################################################################################################################
 portland = Basemap(projection='merc', resolution='c', epsg=4326, lon_0=-122.64, lat_0=45.54,
                   area_thresh=1000.0, llcrnrlon=-122.83, llcrnrlat=45.43, urcrnrlon=-122.46, urcrnrlat=45.65)
-coords = getCoords.getAll()
+allData = getCoords.getAll()
+setCoords = getCoords.getSet(["SHOTS FIRED"], allData)
+filteredData = getCoords.filterDate("01/01/2016", "12/31/2016", setCoords)
+#sortedData = getCoords.sortDate(filteredData)
+#setCoords = getCoords.getSet(["SHOTS FIRED"], sortedData)
+#coords = getCoords.getSet(["SHOTS FIRED"], getCoords.filterDate( "01/01/2016", "12/31/2016",getCoords.sortDate(getCoords.getAll()))_
+#smallSet = getCoords.getSet(["SHOTS FIRED"], coords)
+#coords = [tuple[0] for tuple in coords]
+#data = [tuple[1] for tuple in coords]
 
 ########################################################################################################################
 #                                                  FUNCTION: plotPoints
 #   Plot the crime data points onto the map
 ########################################################################################################################
-def plotPoints():
+def plotPoints(coords):
     for tuple in coords:
-        portland.plot(tuple[0], tuple[1], 'bo', markersize=7, latlon=True)
+        portland.plot(tuple[0][0], tuple[0][1], 'bo', markersize=7, latlon=True)
 
 
 
@@ -45,7 +53,7 @@ def main():
     portland.arcgisimage(service='World_Street_Map', xpixels = 150000)
 
     # Draw the points on the map
-    plotPoints()
+    plotPoints(filteredData)
 
     # Render the map
     plt.show()
