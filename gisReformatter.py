@@ -25,7 +25,8 @@ outProj = Proj(init='epsg:4326')
 ########################################################################################################################
 def main():
     #Create the final document
-    f = open('lat-lon', 'w')
+    allData = open('lat-lon', 'w')
+    sampleData = open('sample', 'w')
 
     # Get the files in the CSV folder
     csvFiles = glob.glob("csv/*.csv")
@@ -34,21 +35,33 @@ def main():
     for filename in csvFiles:
         csvFile = open(filename, 'rt')
         reader = csv.reader(csvFile)
-        for row in reader:
+        for i, row in enumerate(reader):
             if "x_coordinate" not in row:
                 inProj = Proj(init='esri:102726', preserve_units=True)
                 outProj = Proj(init='epsg:4236')
                 x,y=transform(inProj,outProj,float(row[5]),float(row[6]))
                 print x, y
-                f.write(row[0].strip(' ') + '\t')
-                f.write(row[1].strip(' ') + '\t')
-                f.write(row[2].strip(' ') + '\t')
-                f.write(row[3].strip(' ') + '\t')
-                f.write(row[4].strip(' ') + '\t')
-                f.write(str(x)+ '\t')
-                f.write(str(y) + '\t')
-                f.write(row[7].strip(' '))
-                f.write('\n')
+                allData.write(row[0].strip(' ') + '\t')
+                allData.write(row[1].strip(' ') + '\t')
+                allData.write(row[2].strip(' ') + '\t')
+                allData.write(row[3].strip(' ') + '\t')
+                allData.write(row[4].strip(' ') + '\t')
+                allData.write(str(x)+ '\t')
+                allData.write(str(y) + '\t')
+                allData.write(row[7].strip(' '))
+                allData.write('\n')
 
-    f.close()
+                if i < 51:
+                    sampleData.write(row[0].strip(' ') + '\t')
+                    sampleData.write(row[1].strip(' ') + '\t')
+                    sampleData.write(row[2].strip(' ') + '\t')
+                    sampleData.write(row[3].strip(' ') + '\t')
+                    sampleData.write(row[4].strip(' ') + '\t')
+                    sampleData.write(str(x) + '\t')
+                    sampleData.write(str(y) + '\t')
+                    sampleData.write(row[7].strip(' '))
+                    sampleData.write('\n')
+
+    allData.close()
+    sampleData.close()
 main()
