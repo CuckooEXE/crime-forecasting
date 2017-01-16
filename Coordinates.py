@@ -35,20 +35,24 @@ class Coordinates:
     #       - latlonColumns [int, int]: indices of lat and lon column
     #       - filename (string): name of file
     ####################################################################################################################
-    def __init__(self, filename, dateColumn, searchColumns=[], latlonColumns=[]):
-        self.searchColumns = searchColumns
-        self.latlonColumns = latlonColumns
-        self.dateColumn = dateColumn
-
-        # Open the file with all the coordinates
-        with open(filename, 'r') as file:
-            # Loop through and create a list
-            self.metaData =  [[splits for i,splits in enumerate(line.strip('\n').split("\t")) if splits is not "" and i not in latlonColumns] for line in file]
-            file.seek(0,0)
-            self.data = [[splits for i,splits in enumerate(line.strip('\n').split("\t")) if splits is not ""] for line in file]
-            file.seek(0, 0)
-            self.latlon = [[float([splits for splits in line.strip('\n').split("\t") if splits is not ""][latlonColumns[0]]), float([splits for splits in line.strip('\n').split("\t") if splits is not ""][latlonColumns[1]])] for line in file]
-            print "Finished building class data"
+    def __init__(self, **kwargs):
+        if kwargs['fullData'] is None:
+            self.searchColumns = kwargs['searchColumns']
+            self.latlonColumns = kwargs['latlonColumns']
+            self.dateColumn = kwargs['dateColumn']
+            # Open the file with all the coordinates
+            with open(kwargs['filename'], 'r') as file:
+                # Loop through and create a list
+                self.metaData =  [[splits for i,splits in enumerate(line.strip('\n').split("\t")) if splits is not "" and i not in kwargs['latlonColumns']] for line in file]
+                file.seek(0,0)
+                self.data = [[splits for i,splits in enumerate(line.strip('\n').split("\t")) if splits is not ""] for line in file]
+                file.seek(0, 0)
+                self.latlon = [[float([splits for splits in line.strip('\n').split("\t") if splits is not ""][kwargs['latlonColumns'][0]]), float([splits for splits in line.strip('\n').split("\t") if splits is not ""][kwargs['latlonColumns'][1]])] for line in file]
+                print "Finished building class data"
+        else:
+            self.data = kwargs['fullData']
+            self.metaData = [[splits for i,splits in enumerate(line) if splits is not "" and i not in kwargs['latlonColumns']] for line in kwargs['fullData']]
+            self.latlon = [[float([splits for splits in line if splits is not ""][kwargs['latlonColumns'][0]]), float([splits for splits in line if splits is not ""][kwargs['latlonColumns'][1]])] for line in kwargs['fullData']]
 
     ####################################################################################################################
     #                                                  FUNCTION: getSample
@@ -74,8 +78,8 @@ class Coordinates:
     #   Parameters:
     #       - data (self.data): full list of data
     ####################################################################################################################
-    def extractMetadata(self, data):
-        return [[word for i, word in enumerate(line) if i in self.searchColumns] for line in data]
+    def extractMetadata(self, data=None):
+        return [[word for i, word in enumerate(line) if i in self.searchColumns] for line in self.data] if data is None else [[word for i, word in enumerate(line) if i in self.searchColumns] for line in data]
 
     ########################################################################################################################
     #                                                  FUNCTION: getSet
