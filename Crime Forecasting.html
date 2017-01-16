@@ -11751,7 +11751,7 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="National-Institute-of-Justice-Crime-Forecasting-Challenge">National Institute of Justice Crime Forecasting Challenge<a class="anchor-link" href="#National-Institute-of-Justice-Crime-Forecasting-Challenge">&#182;</a></h1><p>This Github is an entry for the <a href="http://www.nij.gov/funding/Pages/fy16-crime-forecasting-challenge.aspx">NIJ Real-Time Crime Forecasting Challenge</a>.</p>
+<h1 id="National-Institute-of-Justice-Crime-Forecasting-Challenge">National Institute of Justice Crime Forecasting Challenge<a class="anchor-link" href="#National-Institute-of-Justice-Crime-Forecasting-Challenge">&#182;</a></h1><p>This page is an entry for the <a href="http://www.nij.gov/funding/Pages/fy16-crime-forecasting-challenge.aspx">NIJ Real-Time Crime Forecasting Challenge</a>. The challenge basically asks, using real historical data on crimes, to predict crimes in Portland, Oregon from March 1st through May 31st.</p>
 <h3 id="Team">Team<a class="anchor-link" href="#Team">&#182;</a></h3><p>This is a small team entry with the following team-members:</p>
 <ul>
 <li>David Freiberg - PhD Student (Materials Science), Drexel University</li>
@@ -11760,6 +11760,98 @@ div#notebook {
 <li>Christine Palmer - Data Analyst, Public Sector</li>
 <li>Matt Wolf - Data Analyst, Public Sector</li>
 </ul>
+<h3 id="The-Data">The Data<a class="anchor-link" href="#The-Data">&#182;</a></h3><p>NIJ provided data from March 1st, 2012 until the end of the competition, February 28th. They provided data in multiple different forms, such as db files and shapefiles, but utilizing the csv files would be more efficient. A huge speedbump was determining their geodetic projection scheme.</p>
+<p>Turns out NIJ decided to release the data in an odd format (primarily used by DoD and counterparts): WGS 84. A script was created using the Python project PyProj to convert the coordinates. The script creates two files: a file containing all data, and a file containing only the first 50 lines for development purposes.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1">########################################################################################################################</span>
+<span class="c1">#                                                  IMPORT LIBRARIES</span>
+<span class="c1">#</span>
+<span class="c1">#   pyproj - coordinate library for python</span>
+<span class="c1">#   glob - detect files inside a directory for parsing</span>
+<span class="c1">#   csv - edit CSV files</span>
+<span class="c1">########################################################################################################################</span>
+<span class="kn">from</span> <span class="nn">pyproj</span> <span class="kn">import</span> <span class="n">Proj</span><span class="p">,</span> <span class="n">transform</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">csv</span>
+
+<span class="c1">########################################################################################################################</span>
+<span class="c1">#                                                  GLOBAL VARIABLES</span>
+<span class="c1">#</span>
+<span class="c1">#   inProj - the crazy coordinate system they use</span>
+<span class="c1">#   outProj - lat/lon coordinate system</span>
+<span class="c1">########################################################################################################################</span>
+<span class="n">inProj</span> <span class="o">=</span> <span class="n">Proj</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="s1">&#39;epsg:3857&#39;</span><span class="p">)</span>
+<span class="n">outProj</span> <span class="o">=</span> <span class="n">Proj</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="s1">&#39;epsg:4326&#39;</span><span class="p">)</span>
+
+
+<span class="c1">########################################################################################################################</span>
+<span class="c1">#                                                  FUNCTION: main</span>
+<span class="c1">#   Drives the program (old habits die hard)</span>
+<span class="c1">########################################################################################################################</span>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="c1">#Create the final document</span>
+    <span class="n">allData</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;lat-lon&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">sampleData</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;sample&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Get the files in the CSV folder</span>
+    <span class="n">csvFiles</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;csv/*.csv&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Loop through them and make a super CSV</span>
+    <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">csvFiles</span><span class="p">:</span>
+        <span class="n">csvFile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;rt&#39;</span><span class="p">)</span>
+        <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="n">csvFile</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">reader</span><span class="p">):</span>
+            <span class="k">if</span> <span class="s2">&quot;x_coordinate&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">row</span><span class="p">:</span>
+                <span class="n">inProj</span> <span class="o">=</span> <span class="n">Proj</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="s1">&#39;esri:102726&#39;</span><span class="p">,</span> <span class="n">preserve_units</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                <span class="n">outProj</span> <span class="o">=</span> <span class="n">Proj</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="s1">&#39;epsg:4236&#39;</span><span class="p">)</span>
+                <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="n">transform</span><span class="p">(</span><span class="n">inProj</span><span class="p">,</span><span class="n">outProj</span><span class="p">,</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">5</span><span class="p">]),</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">6</span><span class="p">]))</span>
+                <span class="k">print</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+                <span class="n">allData</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">allData</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">allData</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">allData</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">allData</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">allData</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">+</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">allData</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">allData</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">))</span>
+                <span class="n">allData</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">51</span><span class="p">:</span>
+                    <span class="n">sampleData</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="n">sampleData</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="n">sampleData</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="n">sampleData</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="n">sampleData</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="n">sampleData</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="n">sampleData</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="n">sampleData</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">))</span>
+                    <span class="n">sampleData</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="n">allData</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">sampleData</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The next step I took was to write code to handle the data itself. That means sorting the data via the dates, or extracting data with certain keywords (i.e. only data with 'Assault' or 'Gang Related' in it), or even for mass manipulation of latitude and longitude.</p>
+<p>Originally I wrote a small script with a bunch of functions to do these seperately, but then I realized it was probably better to write an 'engine' for efficieny and portability for future projects.</p>
 
 </div>
 </div>
