@@ -35,7 +35,7 @@ def main():
     for filename in csvFiles:
         csvFile = open(filename, 'rt')
         reader = csv.reader(csvFile)
-        for i, row in enumerate(reader):
+        for row in reader:
             if "x_coordinate" not in row:
                 inProj = Proj(init='esri:102726', preserve_units=True)
                 outProj = Proj(init='epsg:4236')
@@ -51,17 +51,7 @@ def main():
                 allData.write(row[7].strip(' '))
                 allData.write('\n')
 
-                if i < 51:
-                    sampleData.write(row[0].strip(' ') + '\t')
-                    sampleData.write(row[1].strip(' ') + '\t')
-                    sampleData.write(row[2].strip(' ') + '\t')
-                    sampleData.write(row[3].strip(' ') + '\t')
-                    sampleData.write(row[4].strip(' ') + '\t')
-                    sampleData.write(str(x) + '\t')
-                    sampleData.write(str(y) + '\t')
-                    sampleData.write(row[7].strip(' '))
-                    sampleData.write('\n')
-
+    sampleData.write(allData[:50])
     allData.close()
     sampleData.close()
 main()
