@@ -25,8 +25,8 @@ outProj = Proj(init='epsg:4326')
 ########################################################################################################################
 def main():
     #Create the final document
-    allData = open('lat-lon', 'w')
-    sampleData = open('sample', 'w')
+    allData = open('lat-lono', 'w')
+    sampleData = open('sampleo', 'w')
 
     # Get the files in the CSV folder
     csvFiles = glob.glob("csv/*.csv")
@@ -37,7 +37,7 @@ def main():
         reader = csv.reader(csvFile)
         for row in reader:
             if "x_coordinate" not in row:
-                inProj = Proj(init='esri:102726', preserve_units=True)
+                inProj = Proj(init='esri:102726')
                 outProj = Proj(init='epsg:4236')
                 x,y=transform(inProj,outProj,float(row[5]),float(row[6]))
                 print x, y

@@ -90,19 +90,8 @@ class Coordinates:
     def getSet(self, wordList, data=None):
         if data is None:
             return [line for line in self.data if len(set([line[x] for x in self.searchColumns]) & set(wordList)) > 0]
-            '''# Loop through and create a list
-            for line in self.data:
-                possibleWords = [line[x] for x in self.searchColumns]
-                if len(set(possibleWords) & set(wordList)) > 0:
-                    returnSet.append(line)
-            '''
         else:
             return [line for line in self.data if len(set([line[x] for x in self.searchColumns]) & set(wordList)) > 0]
-            '''for line in data:
-                possibleWords = [line[x] for x in self.searchColumns]
-                if len(set(possibleWords) & set(wordList)) > 0:
-                    returnSet.append(line)
-            '''
 
     ########################################################################################################################
     #                                                  FUNCTION: filterDate
@@ -112,17 +101,11 @@ class Coordinates:
     #       fromDate - first Date to filter
     ########################################################################################################################
     def filterDate(self, fromDate, toDate, data=None):
-        returnSet = []
         # Loop through and create a list
         if data is None:
-            for line in self.data:
-                if parse(line[self.dateColumn]) >= parse(fromDate) and parse(line[self.dateColumn]) <= parse(toDate):
-                    returnSet.append(line)
+            return [line for line in self.data if parse(line[self.dateColumn]) >= parse(fromDate) and parse(line[self.dateColumn]) <= parse(toDate)]
         else:
-            for line in data:
-                if parse(line[self.dateColumn]) >= parse(fromDate) and parse(line[self.dateColumn]) <= parse(toDate):
-                    returnSet.append(line)
-        return returnSet
+            return [line for line in data if parse(line[self.dateColumn]) >= parse(fromDate) and parse(line[self.dateColumn]) <= parse(toDate)]
 
 
 
